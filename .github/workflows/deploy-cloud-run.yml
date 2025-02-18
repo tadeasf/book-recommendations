@@ -3,17 +3,16 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - master  # or main, depending on your default branch
+      - master
 
 env:
-  PROJECT_ID: fort-on-cloud    # Hardcode the project ID instead of using secrets
+  PROJECT_ID: fort-on-cloud
   REGION: europe-west1
   SERVICE_NAME: book-recommendations
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -22,18 +21,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Google Auth
+      - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
         with:
+          token_format: 'access_token'
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          service_account: github-actions-sa@fort-on-cloud.iam.gserviceaccount.com
           project_id: fort-on-cloud
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: fort-on-cloud
+          install_components: 'beta'
+
+      - name: Enable APIs
+        run: |
+          gcloud services enable run.googleapis.com
+          gcloud services enable containerregistry.googleapis.com
+          gcloud services enable cloudbuild.googleapis.com
 
       - name: Authorize Docker push
         run: gcloud auth configure-docker

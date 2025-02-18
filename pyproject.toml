@@ -1,0 +1,25 @@
+[project]
+name = "book-recommendations"
+version = "1.0.0"
+description = "Book recommendation engine combining traditional ML with OpenAI"
+authors = [
+    { name = "Tadeas Fort", email = "business@tadeasfort.com" }
+]
+dependencies = [
+    "pandas>=2.2.3",
+    "openai>=1.63.2",
+    "python-dotenv>=1.0.1",
+    "numpy>=2.2.3",
+    "scikit-learn>=1.6.1",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+license = { text = "GPL-3.0" }
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.rye]
+managed = true
+dev-dependencies = []

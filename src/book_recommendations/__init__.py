@@ -1,3 +1,3 @@
-from .book_recommendations import Book, BookRecommender
+from .main import Book, BookRecommender
 
 __all__ = ['Book', 'BookRecommender']

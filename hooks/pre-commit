@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+import sys
+import subprocess
+from pathlib import Path
+
+def check_env_encryption():
+    env_path = Path('.env')
+    
+    # Check if .env exists
+    if not env_path.exists():
+        return 0
+    
+    # Read .env content
+    with open(env_path, 'r') as f:
+        content = f.read()
+    
+    # If file already contains encrypted values, we're good
+    if 'encrypted:' in content:
+        return 0
+        
+    print("🔒 Unencrypted .env detected. Running encryption...")
+    
+    try:
+        # Run dotenvx encrypt
+        result = subprocess.run(['dotenvx', 'encrypt'], 
+                              capture_output=True, 
+                              text=True)
+        
+        if result.returncode != 0:
+            print("❌ Error encrypting .env file:")
+            print(result.stderr)
+            return 1
+            
+        print("✅ Successfully encrypted .env file")
+        
+        # Stage the encrypted .env file
+        subprocess.run(['git', 'add', '.env'])
+        return 0
+        
+    except FileNotFoundError:
+        print("❌ Error: dotenvx command not found.")
+        print("Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
+        return 1
+
+if __name__ == '__main__':
+    sys.exit(check_env_encryption()) 

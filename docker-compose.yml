@@ -1,30 +1,30 @@
-version: '3.8'
-
 services:
-  api:
-    build: .
+  book-recommendation-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "${PORT:-6969}:${PORT:-6969}"
+      - "6969:6969"
     environment:
-      - PORT=${PORT:-6969}
+      - PORT=6969
       - HOST=0.0.0.0
-      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@db:5432/bookdb}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-bookdb}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PYTHONPATH=/app
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/app
-    command: sh -c "alembic upgrade head && uvicorn src.book_recommendations.main:app --host 0.0.0.0 --port ${PORT:-6969} --reload"
 
   db:
-    image: postgres:15-alpine
+    image: postgres:15.11-alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_DB=${POSTGRES_DB:-bookdb}
     ports:
-      - "5432:5432"
+      - "5469:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -33,5 +33,19 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    container_name: book-recommendations-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@admin.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   postgres_data:
+  pgadmin_data:

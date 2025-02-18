@@ -4,10 +4,12 @@
 # last locked with the following flags:
 #   pre: false
 #   features: []
-#   all-features: false
-#   with-sources: false
+#   all-features: true
+#   with-sources: true
 #   generate-hashes: false
-#   universal: false
+#   universal: true
+
+--index-url https://pypi.org/simple/
 
 -e file:.
 alembic==1.14.1
@@ -25,11 +27,14 @@ certifi==2025.1.31
     # via httpx
 click==8.1.8
     # via uvicorn
+colorama==0.4.6 ; platform_system == 'Windows'
+    # via click
+    # via tqdm
 distro==1.9.0
     # via openai
 fastapi==0.115.8
     # via book-recommendations
-greenlet==3.1.1
+greenlet==3.1.1 ; (python_full_version < '3.14' and platform_machine == 'AMD64') or (python_full_version < '3.14' and platform_machine == 'WIN32') or (python_full_version < '3.14' and platform_machine == 'aarch64') or (python_full_version < '3.14' and platform_machine == 'amd64') or (python_full_version < '3.14' and platform_machine == 'ppc64le') or (python_full_version < '3.14' and platform_machine == 'win32') or (python_full_version < '3.14' and platform_machine == 'x86_64')
     # via sqlalchemy
 gunicorn==23.0.0
     # via book-recommendations

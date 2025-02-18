@@ -29,14 +29,13 @@ build-backend = "pdm.backend"
 
 [tool.rye]
 managed = true
-dev-dependencies = [
-]
+dev-dependencies = []
 
 [project.scripts]
 book-recommendations = "book_recommendations.main:app"
-alembic-init = "scripts.alembic-init:main"
-alembic-migrate = "scripts.alembic-migrate:main"
-alembic-push = "scripts.alembic-push:main"
+alembic-init = "scripts.alembic_init:main"
+alembic-migrate = "scripts.alembic_migrate:main"
+alembic-push = "scripts.alembic_push:main"
 
 [tool.rye.scripts]
 init-db = { cmd = "./scripts/alembic-init.sh" }

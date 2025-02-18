@@ -8,39 +8,43 @@ def check_env_encryption():
     
     # Check if .env exists
     if not env_path.exists():
+        print("No .env file found")
         return 0
     
     # Read .env content
     with open(env_path, 'r') as f:
         content = f.read()
     
-    # If file already contains encrypted values, we're good
-    if 'encrypted:' in content:
-        return 0
+    # Check for unencrypted API keys
+    if 'OPENAI_API_KEY=' in content and 'encrypted:' not in content:
+        print("⚠️  WARNING: Unencrypted API key detected in .env")
+        print("🔒 Running encryption...")
         
-    print("🔒 Unencrypted .env detected. Running encryption...")
-    
-    try:
-        # Run dotenvx encrypt
-        result = subprocess.run(['dotenvx', 'encrypt'], 
-                              capture_output=True, 
-                              text=True)
-        
-        if result.returncode != 0:
-            print("❌ Error encrypting .env file:")
-            print(result.stderr)
-            return 1
+        try:
+            # Run dotenvx encrypt
+            result = subprocess.run(['dotenvx', 'encrypt'], 
+                                  capture_output=True, 
+                                  text=True)
             
-        print("✅ Successfully encrypted .env file")
-        
-        # Stage the encrypted .env file
-        subprocess.run(['git', 'add', '.env'])
-        return 0
-        
-    except FileNotFoundError:
-        print("❌ Error: dotenvx command not found.")
-        print("Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
-        return 1
+            if result.returncode != 0:
+                print("❌ Error encrypting .env file:")
+                print(result.stderr)
+                return 1
+                
+            print("✅ Successfully encrypted .env file")
+            
+            # Stage the encrypted .env file
+            subprocess.run(['git', 'add', '.env'])
+            return 0
+            
+        except FileNotFoundError:
+            print("❌ Error: dotenvx command not found.")
+            print("Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
+            return 1
+    
+    print("✅ .env file is properly encrypted")
+    return 0
 
 if __name__ == '__main__':
+    print("Running pre-commit hook for .env encryption check...")
     sys.exit(check_env_encryption()) 

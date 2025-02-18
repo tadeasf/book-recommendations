@@ -6,7 +6,7 @@ on:
       - master  # or main, depending on your default branch
 
 env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}    # Replace placeholder
+  PROJECT_ID: fort-on-cloud    # Hardcode the project ID instead of using secrets
   REGION: europe-west1
   SERVICE_NAME: book-recommendations
 
@@ -28,23 +28,26 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          project_id: fort-on-cloud
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: fort-on-cloud
 
       - name: Authorize Docker push
         run: gcloud auth configure-docker
 
       - name: Build and Push Container
         run: |-
-          docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
-          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
+          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
       - name: Deploy to Cloud Run
         run: |-
-          gcloud run deploy $SERVICE_NAME \
-            --image gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} \
-            --region $REGION \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
             --set-env-vars "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" 

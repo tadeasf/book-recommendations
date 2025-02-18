@@ -8,7 +8,7 @@ def check_env_encryption():
     
     # Check if .env exists
     if not env_path.exists():
-        print("No .env file found")
+        print("📝 No .env file found")
         return 0
     
     # Read .env content
@@ -39,12 +39,12 @@ def check_env_encryption():
             
         except FileNotFoundError:
             print("❌ Error: dotenvx command not found.")
-            print("Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
+            print("🔧 Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
             return 1
     
     print("✅ .env file is properly encrypted")
     return 0
 
 if __name__ == '__main__':
-    print("Running pre-commit hook for .env encryption check...")
-    sys.exit(check_env_encryption()) 
+    print("🔍 Running pre-commit hook for .env encryption check...")
+    sys.exit(check_env_encryption())

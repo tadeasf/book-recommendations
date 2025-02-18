@@ -3,6 +3,17 @@ import sys
 import subprocess
 from pathlib import Path
 
+"""
+This script checks if the .env file is properly encrypted.
+It will encrypt the .env file if it is not already encrypted.
+It will also stage the encrypted .env file for commit.
+
+To install the dotenvx CLI, run:
+npm install -g @dotenvx/dotenvx
+
+To include the hook in your git repo set git config core.hooksPath hooks
+`git config core.hooksPath hooks`
+"""
 def check_env_encryption():
     env_path = Path('.env')
     

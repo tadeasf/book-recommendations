@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+import subprocess
+from pathlib import Path
+
+"""
+This script decrypts the .env file after a successful push.
+It uses the dotenvx CLI to perform the decryption.
+
+To install the dotenvx CLI, run:
+npm install -g @dotenvx/dotenvx
+
+To include the hook in your git repo set git config core.hooksPath hooks
+`git config core.hooksPath hooks`
+"""
+def decrypt_env():
+    env_path = Path('.env')
+    
+    # Check if .env exists
+    if not env_path.exists():
+        print("📝 No .env file found")
+        return 0
+    
+    print("🔓 Decrypting .env file...")
+    try:
+        # Run dotenvx decrypt
+        result = subprocess.run(['dotenvx', 'decrypt'], 
+                              capture_output=True, 
+                              text=True)
+        
+        if result.returncode != 0:
+            print("❌ Error decrypting .env file:")
+            print(result.stderr)
+            return 1
+            
+        print("✅ Successfully decrypted .env file")
+        return 0
+        
+    except FileNotFoundError:
+        print("❌ Error: dotenvx command not found.")
+        print("🔧 Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
+        return 1
+
+if __name__ == '__main__':
+    print("🔑 Running post-push hook for .env decryption...")
+    decrypt_env()

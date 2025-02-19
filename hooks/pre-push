@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import subprocess
+from pathlib import Path
+
+"""
+This script runs before push to ensure the .env file is encrypted,
+then decrypts it after the push is complete.
+
+To install the dotenvx CLI, run:
+npm install -g @dotenvx/dotenvx
+"""
+def handle_env():
+    env_path = Path('.env')
+    
+    # Check if .env exists
+    if not env_path.exists():
+        print("📝 No .env file found")
+        return 0
+    
+    try:
+        # First ensure it's encrypted for the push
+        print("🔒 Ensuring .env is encrypted for push...")
+        encrypt_result = subprocess.run(['dotenvx', 'encrypt'], 
+                                      capture_output=True, 
+                                      text=True)
+        
+        if encrypt_result.returncode != 0:
+            print("❌ Error encrypting .env file:")
+            print(encrypt_result.stderr)
+            return 1
+        
+        # Allow the push to proceed
+        print("✅ .env is encrypted, proceeding with push...")
+        
+        # Schedule the decryption to happen after push
+        # We use a subprocess to run the decrypt after this script exits
+        subprocess.Popen(['sh', '-c', 'sleep 2 && dotenvx decrypt'], 
+                        stdout=subprocess.PIPE, 
+                        stderr=subprocess.PIPE)
+        
+        return 0
+        
+    except FileNotFoundError:
+        print("❌ Error: dotenvx command not found.")
+        print("🔧 Please install dotenvx CLI with: npm install -g @dotenvx/dotenvx")
+        return 1
+
+if __name__ == '__main__':
+    print("🔐 Running pre-push hook for .env handling...")
+    handle_env()

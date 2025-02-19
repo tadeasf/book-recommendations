@@ -1,5 +1,5 @@
 from typing import List, Optional, TYPE_CHECKING
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, JSON
 from datetime import datetime
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ class BookBase(SQLModel):
     author: str
     description: str
     isbn: Optional[str] = None
-    genres: List[str]
+    genres: List[str] = Field(sa_type=JSON)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -29,4 +29,4 @@ class BookUpdate(SQLModel):
     author: Optional[str] = None
     description: Optional[str] = None
     isbn: Optional[str] = None
-    genres: Optional[List[str]] = None
+    genres: Optional[List[str]] = Field(default=None, sa_type=JSON)

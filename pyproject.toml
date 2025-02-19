@@ -33,11 +33,3 @@ dev-dependencies = []
 
 [project.scripts]
 book-recommendations = "book_recommendations.main:app"
-alembic-init = "scripts.alembic_init:main"
-alembic-migrate = "scripts.alembic_migrate:main"
-alembic-push = "scripts.alembic_push:main"
-
-[tool.rye.scripts]
-init-db = { cmd = "./scripts/alembic-init.sh" }
-migrate = { cmd = "./scripts/alembic-migrate.sh" }
-push = { cmd = "./scripts/alembic-push.sh" }

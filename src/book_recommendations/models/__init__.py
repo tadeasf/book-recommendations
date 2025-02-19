@@ -1,20 +1,24 @@
-from sqlmodel import SQLModel
 from .Book import Book, BookBase, BookCreate, BookRead, BookUpdate
 from .User import User, UserBase, UserCreate, UserRead
 from .UserBook import UserBook
 
-Base = SQLModel
-
+# Export all models
 __all__ = [
-    "Base",
+    # Book models
     "Book",
     "BookBase",
     "BookCreate",
     "BookRead",
     "BookUpdate",
+    # User models
     "User",
     "UserBase",
     "UserCreate",
     "UserRead",
+    # UserBook model
     "UserBook",
 ]
+
+# For Alembic migrations
+from sqlmodel import SQLModel
+Base = SQLModel

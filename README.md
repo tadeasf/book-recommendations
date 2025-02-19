@@ -51,5 +51,3 @@ alembic stamp head
 
 Note: Make sure your database URL is properly configured in `alembic.ini` and your models are properly imported in the migration environment.
 
-* License: GPL-3.0
-

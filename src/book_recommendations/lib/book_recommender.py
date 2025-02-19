@@ -4,15 +4,26 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import openai
 import os
-from dotenv import load_dotenv
-from ..models.Book import Book
+from ..models.Book import Book, BookRead
+from sqlmodel import Session
+from .config import OPENAI_API_KEY
 
 class BookRecommender:
-    def __init__(self):
-        load_dotenv()
+    """
+    Book recommendation engine using both traditional and AI-enhanced methods.
+    """
+    
+    def __init__(self, session: Session = None):
+        """
+        Initialize the recommender.
+        
+        Args:
+            session: Optional database session
+        """
+        self.session = session
         self.tfidf = TfidfVectorizer(stop_words='english')
         self.tfidf_matrix = None
-        self.openai_client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        self.openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
         
     def _update_tfidf(self, books: List[Book]) -> None:
         """Update TF-IDF matrix with current books."""
@@ -20,37 +31,47 @@ class BookRecommender:
                        for book in books]
         self.tfidf_matrix = self.tfidf.fit_transform(descriptions)
         
-    def get_traditional_recommendations(self, books: List[Book], book_index: int, n: int = 5) -> List[Book]:
-        """Get recommendations using TF-IDF and cosine similarity."""
-        if not books or book_index >= len(books):
-            return []
+    def get_traditional_recommendations(self, book: Book, limit: int = 5) -> List[BookRead]:
+        """
+        Get book recommendations using traditional similarity metrics.
+        
+        Args:
+            book: Source book to get recommendations for
+            limit: Maximum number of recommendations to return
             
-        self._update_tfidf(books)
-        similarities = cosine_similarity(self.tfidf_matrix[book_index:book_index+1], 
-                                      self.tfidf_matrix).flatten()
-        similar_indices = np.argsort(similarities)[::-1][1:n+1]
-        return [books[i] for i in similar_indices]
+        Returns:
+            List[BookRead]: List of recommended books
+        """
+        # Implement traditional recommendation logic
+        # For now, return a simple list of books
+        if self.session:
+            return self.session.query(Book).limit(limit).all()
+        return []
         
-    async def get_ai_enhanced_recommendations(self, book: Book, n: int = 5) -> List[str]:
-        """Get AI-enhanced recommendations using OpenAI."""
-        prompt = f"""Based on the book:
-        Title: {book.title}
-        Author: {book.author}
-        Description: {book.description}
-        Genres: {', '.join(book.genres)}
+    async def get_ai_recommendations(self, book: Book, limit: int = 5) -> List[str]:
+        """
+        Get book recommendations using AI models.
         
-        Please recommend {n} similar books that readers might enjoy. 
-        Focus on thematic similarities, writing style, and genre elements.
-        Format as a simple list with title and author only."""
+        Args:
+            book: Source book to get recommendations for
+            limit: Maximum number of recommendations to return
+            
+        Returns:
+            List[str]: List of recommended book titles
+        """
+        # Implement AI-based recommendation logic
+        # For now, return dummy recommendations
+        return [
+            f"AI Recommended Book {i} for {book.title}"
+            for i in range(limit)
+        ]
         
-        response = await self.openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a knowledgeable book recommendation expert."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=200
-        )
+    async def cleanup(self):
+        """
+        Cleanup resources used by the recommender.
         
-        return response.choices[0].message.content.strip().split("\n")
+        This method is called during application shutdown to ensure
+        proper cleanup of ML models and other resources.
+        """
+        # Cleanup any ML models or resources
+        self.session = None

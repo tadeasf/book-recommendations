@@ -27,6 +27,10 @@ click==8.1.8
     # via uvicorn
 distro==1.9.0
     # via openai
+dnspython==2.7.0
+    # via email-validator
+email-validator==2.2.0
+    # via pydantic
 fastapi==0.115.8
     # via book-recommendations
 greenlet==3.1.1
@@ -42,6 +46,7 @@ httpx==0.28.1
     # via openai
 idna==3.10
     # via anyio
+    # via email-validator
     # via httpx
 jiter==0.8.2
     # via openai
@@ -65,6 +70,7 @@ pandas==2.2.3
 psycopg2-binary==2.9.10
     # via book-recommendations
 pydantic==2.10.6
+    # via book-recommendations
     # via fastapi
     # via openai
     # via sqlmodel
@@ -76,6 +82,8 @@ python-dotenv==1.0.1
     # via book-recommendations
 pytz==2025.1
     # via pandas
+scalar-fastapi==1.0.3
+    # via book-recommendations
 scikit-learn==1.6.1
     # via book-recommendations
 scipy==1.15.2
